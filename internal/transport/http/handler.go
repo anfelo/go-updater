@@ -50,6 +50,7 @@ func (h *Handler) mapRoutes() {
 	}).Methods("GET")
 
 	h.Router.HandleFunc("/api/v1/releases", h.GetReleases).Methods("GET")
+	h.Router.HandleFunc("/api/v1/releases/latest", h.GetLatest).Methods("GET")
 }
 
 // Serve - Starts the server and handles shutdowns gracefully

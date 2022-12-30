@@ -4,8 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/anfelo/go-updater/internal/release"
@@ -52,11 +55,11 @@ type PlatformAsset struct {
 	ApiURL      string `json:"api_url"`
 	URL         string `json:"url"`
 	ContentType string `json:"content_type"`
-	Size        string `json:"size"`
+	Size        int64  `json:"size"`
 }
 
-// LatestResponse - latest release response model
-type LatestResponse struct {
+// ReleaseResponse - latest release response model
+type ReleaseResponse struct {
 	Version   string                   `json:"version"`
 	Notes     string                   `json:"notes"`
 	PubDate   time.Time                `json:"pub_date"`
@@ -147,10 +150,64 @@ func (h *Handler) GetLatest(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	log.Info(resp)
 
-	if err := json.NewEncoder(w).Encode(release); err != nil {
+	if err := json.NewEncoder(w).Encode(mapToRelease(release)); err != nil {
 		log.Error("error encoding to json")
 		panic(err)
 	}
+}
+
+func mapToRelease(gr GithubRelease) ReleaseResponse {
+	r := ReleaseResponse{
+		Version:   gr.TagName,
+		Notes:     gr.Body,
+		PubDate:   gr.PublishedAt,
+		Platforms: map[string]PlatformAsset{},
+	}
+
+	for _, asset := range gr.Assets {
+		platform := checkPlatform(asset.Name)
+		if platform == "" {
+			continue
+		}
+
+		r.Platforms[platform] = PlatformAsset{
+			Name:        asset.Name,
+			ApiURL:      asset.URL,
+			URL:         asset.BrowserDownloadURL,
+			ContentType: asset.ContentType,
+			Size:        int64(math.Round(float64(asset.Size) / 1000000)),
+		}
+	}
+
+	return r
+}
+
+func checkPlatform(fileName string) string {
+	ext := filepath.Ext(fileName)
+	_, ext, _ = strings.Cut(ext, ".")
+
+	arch := ""
+	if strings.Contains(fileName, "arm64") || strings.Contains(fileName, "aarch64") {
+		arch = "_arm64"
+	}
+
+	if (strings.Contains(fileName, "mac") || strings.Contains(fileName, "darwin")) && ext == "zip" {
+		return "darwin" + arch
+	}
+
+	directCache := []string{"exe", "dmg", "rmp", "deb", "AppImage"}
+	if contains(directCache, ext) {
+		return ext + arch
+	}
+	return ""
+}
+
+func contains(slice []string, name string) bool {
+	for _, v := range slice {
+		if v == name {
+			return true
+		}
+	}
+	return false
 }

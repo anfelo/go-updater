@@ -8,7 +8,6 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
@@ -16,19 +15,19 @@ import (
 // Handler - app handler structure
 type Handler struct {
 	Router  *mux.Router
-	Service Service
+	Service UpdaterService
 	Server  *http.Server
-	Client  *resty.Client
 }
 
 // Service - main service interface
 type Service interface {
+	UpdaterService
 }
 
 // NewHandler - returns a pointer to the handler
-func NewHandler() *Handler {
+func NewHandler(service Service) *Handler {
 	h := &Handler{
-		Client: resty.New(),
+		Service: service,
 	}
 	h.Router = mux.NewRouter()
 	h.Router.Use(CorsMiddleware)
@@ -49,8 +48,7 @@ func (h *Handler) mapRoutes() {
 		fmt.Fprintf(w, "I am alive")
 	}).Methods("GET")
 
-	h.Router.HandleFunc("/api/v1/releases", h.GetReleases).Methods("GET")
-	h.Router.HandleFunc("/api/v1/releases/latest", h.GetLatest).Methods("GET")
+	h.Router.HandleFunc("/api/v1/releases/download", h.DownloadLatest).Methods("GET")
 }
 
 // Serve - Starts the server and handles shutdowns gracefully

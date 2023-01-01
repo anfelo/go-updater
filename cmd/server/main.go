@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 
+	"github.com/anfelo/go-updater/internal/datasource"
 	transportHttp "github.com/anfelo/go-updater/internal/transport/http"
+	"github.com/anfelo/go-updater/internal/updater"
 )
 
 // Run - responsible for the instantiation
@@ -11,7 +13,10 @@ import (
 func Run() error {
 	fmt.Println("Starting up the application")
 
-	httpHandler := transportHttp.NewHandler()
+	datasource := datasource.NewDatasource()
+	updaterService := updater.NewService(datasource)
+
+	httpHandler := transportHttp.NewHandler(updaterService)
 	if err := httpHandler.Serve(); err != nil {
 		return err
 	}

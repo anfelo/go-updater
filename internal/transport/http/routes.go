@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/anfelo/go-updater/internal/updater"
+	"github.com/gorilla/mux"
 	"github.com/mssola/user_agent"
 	log "github.com/sirupsen/logrus"
 )

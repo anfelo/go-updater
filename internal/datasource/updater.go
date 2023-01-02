@@ -3,6 +3,7 @@ package datasource
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -66,7 +67,7 @@ func (d *Datasource) GetLatest(ctx context.Context) (updater.Release, error) {
 	}
 
 	if resp.StatusCode() != 200 {
-		return updater.Release{}, fmt.Errorf("error fetching the latest release from github: %w", err)
+		return updater.Release{}, errors.New("error fetching the latest release from github")
 	}
 
 	var gr GithubRelease

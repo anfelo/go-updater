@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/anfelo/go-updater/internal/updater"
+	"github.com/anfelo/go-updater/internal/helpers"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -119,17 +120,8 @@ func checkPlatform(fileName string) string {
 	}
 
 	directCache := []string{"exe", "dmg", "rmp", "deb", "AppImage"}
-	if contains(directCache, ext) {
+	if helpers.Contains(directCache, ext) {
 		return ext + arch
 	}
 	return ""
-}
-
-func contains(slice []string, name string) bool {
-	for _, v := range slice {
-		if v == name {
-			return true
-		}
-	}
-	return false
 }

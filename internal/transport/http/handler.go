@@ -49,6 +49,7 @@ func (h *Handler) mapRoutes() {
 	}).Methods("GET")
 
 	h.Router.HandleFunc("/api/v1/releases/download", h.DownloadLatest).Methods("GET")
+	h.Router.HandleFunc("/api/v1/releases/download/{platform}", h.DownloadPlatform).Methods("GET")
 }
 
 // Serve - Starts the server and handles shutdowns gracefully

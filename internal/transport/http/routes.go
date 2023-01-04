@@ -36,8 +36,7 @@ type PlatformAssetResponse struct {
 // DownloadLatest - downloads the latest release non-prerelease and non-draft
 func (h *Handler) DownloadLatest(w http.ResponseWriter, r *http.Request) {
 	ua := user_agent.New(r.Header.Get("user-agent"))
-	vars := mux.Vars(r)
-	isUpdate := vars["update"] != ""
+	isUpdate := r.URL.Query().Get("update") != ""
 
 	platform := ""
 	if ua.OSInfo().Name == "Mac OS X" && isUpdate {
@@ -54,6 +53,50 @@ func (h *Handler) DownloadLatest(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error(err)
 		http.Error(w, "release not found", http.StatusNotFound)
+		return
+	}
+
+	asset, exists := latest.Platforms[platform]
+	if !exists {
+		http.Error(w, "no download available for your platform", http.StatusNotFound)
+		return
+	}
+
+	// TODO: Check if the token for private repos
+	// proxy private download
+
+	w.Header().Set("Location", asset.URL)
+	w.WriteHeader(http.StatusFound)
+}
+
+func (h *Handler) DownloadPlatform(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	p := vars["platform"]
+	if p == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	isUpdate := r.URL.Query().Get("update") != ""
+	platform := p
+	if p == "mac" && !isUpdate {
+		platform = "dmg"
+	}
+
+	if platform == "mac_arm64" && !isUpdate {
+		platform = "dmg_arm64"
+	}
+
+	latest, err := h.Service.GetLatest(r.Context())
+	if err != nil {
+		log.Error(err)
+		http.Error(w, "release not found", http.StatusNotFound)
+		return
+	}
+
+	platform, err = getAlias(platform)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 

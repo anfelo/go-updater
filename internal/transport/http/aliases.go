@@ -7,18 +7,18 @@ import (
 )
 
 var aliases = map[string][]string{
-	"darwin":         []string{"mac", "macos", "osx"},
-	"darwin_arm64":   []string{"mac_arm64", "macos_arm64", "osx_arm64"},
-	"exe":            []string{"win32", "windows", "win"},
-	"exe_arm64":      []string{"win32_arm64", "windows_arm64", "win_arm64"},
-	"deb":            []string{"debian"},
-	"deb_arm64":      []string{"debian_arm64"},
-	"rmp":            []string{"fedora"},
-	"rmp_arm64":      []string{"fedora_arm64"},
-	"AppImage":       []string{"appimage"},
-	"AppImage_arm64": []string{"appimage_arm64"},
-	"dmg":            []string{"dmg"},
-	"dmg_arm64":      []string{"dmg_arm64"},
+	"darwin":         {"mac", "macos", "osx"},
+	"darwin_arm64":   {"mac_arm64", "macos_arm64", "osx_arm64"},
+	"exe":            {"win32", "windows", "win"},
+	"exe_arm64":      {"win32_arm64", "windows_arm64", "win_arm64"},
+	"deb":            {"debian"},
+	"deb_arm64":      {"debian_arm64"},
+	"rmp":            {"fedora"},
+	"rmp_arm64":      {"fedora_arm64"},
+	"AppImage":       {"appimage"},
+	"AppImage_arm64": {"appimage_arm64"},
+	"dmg":            {"dmg"},
+	"dmg_arm64":      {"dmg_arm64"},
 }
 
 func getAlias(platform string) (string, error) {

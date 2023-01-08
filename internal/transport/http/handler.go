@@ -48,8 +48,11 @@ func (h *Handler) mapRoutes() {
 		fmt.Fprintf(w, "I am alive")
 	}).Methods("GET")
 
+	h.Router.HandleFunc("/", h.Home).Methods("GET")
 	h.Router.HandleFunc("/api/v1/releases/download", h.DownloadLatest).Methods("GET")
 	h.Router.HandleFunc("/api/v1/releases/download/{platform}", h.DownloadPlatform).Methods("GET")
+	h.Router.HandleFunc("/api/v1/update/{platform}/{version}", h.Update).Methods("GET")
+	// TODO: Handle win32 releases
 }
 
 // Serve - Starts the server and handles shutdowns gracefully

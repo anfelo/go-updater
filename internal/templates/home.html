@@ -1,0 +1,65 @@
+{{define "style"}}
+<style>
+    .release-content {
+        width: 500px;
+    }
+
+    header,
+    footer,
+    .releases-title {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .releases {
+        margin-bottom: 20px;
+    }
+
+    .releases li {
+        display: flex;
+        justify-content: space-between;
+    }
+</style>
+{{end}}
+
+{{define "content"}}
+<section class="hero is-dark is-fullheight">
+    <div class="hero-body">
+        <div class="release-content">
+
+            <h1 class="title has-text-centered">{{.Account}}/{{.Repository}}</h1>
+
+            {{if .UserPlatform}}
+            <div class="buttons is-centered">
+                <a class="button is-large is-responsive" href={{.UserPlatformURL}}>
+                    Download .{{.UserPlatform}}
+                </a>
+            </div>
+            {{end}}
+
+            <div class="releases-title">
+                <p class="title is-5">Latests Release:</p>
+                <h2 class="subtitle">{{.Date}}</h2>
+            </div>
+            <ul class="releases">
+                {{range $k, $v := .Files}}
+                <li><span><strong>{{$k}}:</strong> <a class="has-text-danger" href={{$v.URL}}>/latest/{{$k}}</a></span>
+                    <small class="has-text-grey-lighter">{{$v.SizeInMB}}</small>
+                </li>
+                {{end}}
+            </ul>
+
+            <footer>
+                <div class="release-version">
+                    <span class="tag is-primary">{{.Version}}</span>
+                    <a class="has-text-link" href={{.ReleaseNotes}}>Release Notes</a>
+                </div>
+                <a href={{.AllReleases}} class="has-text-link">All Releases</a>
+                <a href={{.Github}} class="has-text-link">Github</a>
+            </footer>
+        </div>
+    </div>
+</section>
+{{end}}

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -99,7 +98,7 @@ func mapToRelease(gr GithubRelease) updater.Release {
 			ApiURL:      asset.URL,
 			URL:         asset.BrowserDownloadURL,
 			ContentType: asset.ContentType,
-			Size:        int64(math.Round(float64(asset.Size) / 1000000)),
+			Size:        asset.Size,
 		}
 	}
 
